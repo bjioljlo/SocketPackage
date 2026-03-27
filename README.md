@@ -225,12 +225,3 @@ pytest
 ## 貢獻
 
 歡迎提交 issue 和 pull request 來改進這個套件。
-
-## 授權
-
-此專案使用 MIT 授權。
-
-## 聯絡資訊
-
-開發者：2887_林家豪
-電子郵件：bjioljlo@chinesgamer.net
