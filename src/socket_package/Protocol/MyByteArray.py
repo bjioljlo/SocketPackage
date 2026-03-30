@@ -13,9 +13,9 @@ class MyByteArray():
     def WriteByte(self, input: bytes):
         self.__msg += struct.pack("s", input)
     def WriteByteArray(self, input: bytearray):
-        lenth = len(input)
-        formatStr:str = str(lenth) + "s"
-        msg:bytearray = struct.pack("I", lenth)
+        length = len(input)
+        formatStr:str = str(length) + "s"
+        msg:bytearray = struct.pack("I", length)
         msg += struct.pack(formatStr, input)
         self.__msg += msg
     def WriteStr(self, input: str):
@@ -23,10 +23,10 @@ class MyByteArray():
         self.WriteByteArray(temp_bytes)
     def WriteInt(self, input: int):
         self.__msg += struct.pack("I", input)
-        
+
     def ReadByte(self):
         output = struct.unpack_from("s", self.__msg, self.__offset)[0]
-        self.__offset += struct.calcsize("s")  
+        self.__offset += struct.calcsize("s")
         return output
     def ReadStr(self) -> str:
         temp_bytes = self.ReadByteArray()
@@ -37,9 +37,9 @@ class MyByteArray():
         self.__offset += struct.calcsize("I")
         return output
     def ReadByteArray(self) -> bytearray:
-        output_lenth = struct.unpack_from("I", self.__msg, self.__offset)[0]
-        self.__offset += struct.calcsize("I") 
-        formatStr:str = str(output_lenth) + "s"
+        output_length = struct.unpack_from("I", self.__msg, self.__offset)[0]
+        self.__offset += struct.calcsize("I")
+        formatStr:str = str(output_length) + "s"
         output = struct.unpack_from(formatStr, self.__msg, self.__offset)[0]
         self.__offset += struct.calcsize(formatStr)
         return output

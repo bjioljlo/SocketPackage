@@ -6,7 +6,7 @@ from socket_package.Protocol.FrameCodec import FrameDecoder, FrameTooLargeError
 from socket_package.Protocol.MyByteArray import MyByteArray
 from socket_package.Protocol.MySocket import TSocket
 from socket_package.Protocol.ProtocolKinds import MainKind, SubKind
-from socket_package.Protocol.RecvMsgProtocol import IRecvMainkind
+from socket_package.Protocol.RecvMsgProtocol import IRecvProtocol
 from socket_package.Protocol.SocketConfig import ClientConfig
 
 class ClientSocket(TSocket):
@@ -23,7 +23,7 @@ class ClientSocket(TSocket):
         return self.__IsShutDown
 
     def __init__(self, config: ClientConfig | None = None) -> None:
-        self.__client_socket: socket | None = None
+        self.__client_socket: socket.socket | None = None
         self.__IsConnect: bool = False
         self.__IsShutDown: bool = False
         self.__config = config or ClientConfig()
@@ -32,25 +32,25 @@ class ClientSocket(TSocket):
     def config(self) -> ClientConfig:
         return self.__config
 
-    def Run(self, recvmainkind: IRecvMainkind):
+    def Run(self, recvProtocol: IRecvProtocol):
         """
         Establishes a connection to the server and starts a thread to receive messages.
 
         This method attempts to connect to a server at a specified IP address and port.
         Once connected, it spawns a new thread to handle incoming messages using the
-        provided `recvmainkind` protocol. The connection process will retry until
+        provided `recvProtocol` protocol. The connection process will retry until
         successful or until the client is manually stopped.
 
-        :param recvmainkind: An instance implementing the IRecvMainkind interface,
+        :param recvProtocol: An instance implementing the IRecvProtocol interface,
                             responsible for handling received messages.
         """
         while not self.__IsConnect:
-            if not self.__IsConnect and recvmainkind is not None:
+            if not self.__IsConnect and recvProtocol is not None:
                 try:
                     print("\n[Client][{}] ".format("Start Run Client Socket"))
                     self.__client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     self.__client_socket.connect((self.__config.host, self.__config.port))
-                    receive_thread = threading.Thread(target=self._receive_messages, args=(self.__client_socket, recvmainkind), daemon=True)
+                    receive_thread = threading.Thread(target=self._receive_messages, args=(self.__client_socket, recvProtocol), daemon=True)
                     receive_thread.start()
                     self.__IsConnect = True
                 except Exception:
@@ -71,7 +71,7 @@ class ClientSocket(TSocket):
             self.__client_socket.close()
         self.__IsShutDown = True
 
-    def _receive_messages(self, client_socket:socket, recvmainkind: IRecvMainkind):
+    def _receive_messages(self, client_socket:socket, recvProtocol: IRecvProtocol):
         decoder = FrameDecoder(max_frame_size=self.__config.max_frame_size)
         while True:
             try:
@@ -88,8 +88,8 @@ class ClientSocket(TSocket):
             for frame in frames:
                 aMsg = MyByteArray(frame)
                 version = aMsg.ReadInt()
-                mainkind = aMsg.ReadInt()
-                subkind = aMsg.ReadInt()
+                main_kind = aMsg.ReadInt()
+                sub_kind = aMsg.ReadInt()
                 if version != self.__config.protocol_version:
                     print(
                         "\n[Client][VersionMismatch] recv={}, expected={}".format(
@@ -97,9 +97,9 @@ class ClientSocket(TSocket):
                         )
                     )
                     continue
-                if mainkind == MainKind.CONTROL and subkind == SubKind.HEARTBEAT:
+                if main_kind == MainKind.CONTROL and sub_kind == SubKind.HEARTBEAT:
                     continue
-                recvmainkind.recv_msg(client_socket, mainkind, subkind, aMsg)
-        print("\n[Client][{}] ".format("Server disconnet..."))
+                recvProtocol.recv_msg(client_socket, main_kind, sub_kind, aMsg)
+        print("\n[Client][{}] ".format("Server disconnect..."))
         client_socket.close()
         self.__IsConnect = False

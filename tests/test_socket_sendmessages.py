@@ -15,14 +15,14 @@ class _FakeSocket:
 
 
 class _SocketImpl(TSocket):
-    def Run(self, recvmainkind):
+    def Run(self, recvProtocol):
         return None
 
     def Stop(self):
         return None
 
 
-def test_sendmessages_writes_header_and_payload_in_frame():
+def test_send_messages_writes_header_and_payload_in_frame():
     sock = _FakeSocket()
     impl = _SocketImpl()
     body = MyByteArray()
@@ -40,7 +40,7 @@ def test_sendmessages_writes_header_and_payload_in_frame():
     assert msg.ReadStr() == "payload"
 
 
-def test_sendmessages_validates_arguments():
+def test_send_messages_validates_arguments():
     impl = _SocketImpl()
     with pytest.raises(ValueError):
         impl.SendMessages(None, 1, 2, MyByteArray())
@@ -48,7 +48,7 @@ def test_sendmessages_validates_arguments():
         impl.SendMessages(_FakeSocket(), 1, 2, None)
 
 
-def test_sendheartbeat_writes_control_message():
+def test_send_heartbeat_writes_control_message():
     sock = _FakeSocket()
     impl = _SocketImpl()
     impl.SendHeartbeat(sock)

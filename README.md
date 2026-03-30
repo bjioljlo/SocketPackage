@@ -10,7 +10,7 @@
   - `SubKind.HEARTBEAT = 1`
 - 業務協議（例如聊天、遊戲、通知）請由使用者自行定義。
 - 採用 frame 封包格式（長度前綴），可正確處理拆包/黏包。
-- 訊息 header 固定為：`protocol_version + mainkind + subkind`。
+- 訊息 header 固定為：`protocol_version + main_kind + sub_kind`。
 
 ## 安裝與開發
 

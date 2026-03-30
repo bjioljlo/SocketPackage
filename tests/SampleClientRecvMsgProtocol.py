@@ -17,7 +17,7 @@ class SampleClientRecvMsgProtocol(ProtocolRouter):
         self._SampleMgr.SampleStop()
 
     def _show_other(self, mainSocket: socket, msg: MyByteArray):
-        self._SampleMgr.SampleShowOrther(msg)
+        self._SampleMgr.SampleShowOther(msg)
 
     def _show_me(self, mainSocket: socket, msg: MyByteArray):
         self._SampleMgr.SampleShowMe(msg)

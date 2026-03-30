@@ -6,7 +6,7 @@ import threading
 if __name__ == "__main__":
     mainClient = ClientSocket() # Init ClientSocket
     Sample = SampleClientManager(mainClient) # Create Your Any Manager use by ClientSocket
-    recv = SampleClientRecvMsgProtocol(Sample)  # Your protocol file override from class TRecvMainkind
+    recv = SampleClientRecvMsgProtocol(Sample)  # Your protocol file override from class TRecvProtocol
     mainClient.Run(recv)  # Run socket
 
     # your app function

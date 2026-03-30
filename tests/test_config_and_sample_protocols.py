@@ -84,7 +84,7 @@ def test_sample_client_protocol_routes_actions():
         def SampleStop(self):
             self.stopped = True
 
-        def SampleShowOrther(self, msg: MyByteArray):
+        def SampleShowOther(self, msg: MyByteArray):
             self.other = msg.ReadStr()
 
         def SampleShowMe(self, msg: MyByteArray):
