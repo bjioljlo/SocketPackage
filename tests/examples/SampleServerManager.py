@@ -3,7 +3,7 @@ from socket import socket
 from socket_package import MyByteArray
 from socket_package.Server import ServerSocket
 
-from examples.ProtocolKinds import MainKind, SubKind
+from tests.examples.ProtocolKinds import MainKind, SubKind
 
 
 class SampleServerManager:

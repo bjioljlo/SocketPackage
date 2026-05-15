@@ -4,7 +4,7 @@ from socket_package import MyByteArray
 from socket_package.Client import ClientSocket
 from socket_package.Protocol.ProtocolKinds import PROTOCOL_VERSION
 
-from examples.ProtocolKinds import MainKind, SubKind
+from tests.examples.ProtocolKinds import MainKind, SubKind
 
 
 class SampleClientManager:

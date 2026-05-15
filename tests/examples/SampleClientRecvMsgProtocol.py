@@ -3,8 +3,8 @@ from socket import socket
 from socket_package import MyByteArray
 from socket_package.Protocol.RecvMsgProtocol import ProtocolRouter
 
-from examples.ProtocolKinds import MainKind, SubKind
-from examples.SampleClientManager import SampleClientManager
+from tests.examples.ProtocolKinds import MainKind, SubKind
+from tests.examples.SampleClientManager import SampleClientManager
 
 
 class SampleClientRecvMsgProtocol(ProtocolRouter):
