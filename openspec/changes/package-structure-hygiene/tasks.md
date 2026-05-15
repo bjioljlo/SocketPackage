@@ -21,3 +21,6 @@
 ## 5. Verification
 
 - [x] 5.1 Run `uv run pytest -q` and fix any regressions
+  - [x] 5.1.1 Found missing `tests/__init__.py` (task 3.1 was incomplete); file created
+  - [x] 5.1.2 Found `uv run pytest -q` can't resolve `tests.examples.*` imports in `src/` layout; added `pythonpath = ["."]` in `pyproject.toml`
+  - [x] 5.1.3 All 16 tests pass (`uv run pytest -q` and `uv run python -m pytest -q`)
