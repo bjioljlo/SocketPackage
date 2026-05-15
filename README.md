@@ -93,18 +93,18 @@ client.SendHeartbeat(client.mainSocket, PROTOCOL_VERSION)
 
 已提供可直接執行的示範程式：
 
-- [tests/examples/ProtocolKinds.py](tests/examples/ProtocolKinds.py)
-- [tests/examples/mainServer.py](tests/examples/mainServer.py)
-- [tests/examples/mainClient.py](tests/examples/mainClient.py)
+- [examples/ProtocolKinds.py](examples/ProtocolKinds.py)
+- [examples/mainServer.py](examples/mainServer.py)
+- [examples/mainClient.py](examples/mainClient.py)
 
 啟動方式：
 
 ```bash
 # Terminal 1
-uv run python tests/examples/mainServer.py
+uv run python examples/mainServer.py
 
 # Terminal 2
-uv run python tests/examples/mainClient.py
+uv run python examples/mainClient.py
 ```
 
 client 輸入指令：
@@ -141,7 +141,7 @@ server_cfg = ServerConfig(
 - protocol router（含未處理策略）
 - message header（version + main/sub kind）
 - config 注入（單元）
-- 與 `tests/examples` 連動之 sample protocol 路由（整合測試，見 `tests/integration/`）
+- 與 `examples/` 內 sample protocol 連動的路由行為（整合測試，見 `tests/integration/`）
 
 執行：
 
@@ -167,7 +167,7 @@ uv run pytest -q tests/integration    # 僅整合
 
 ## 通訊協定
 
-示範專案的自訂協定列舉定義在 `tests/examples/ProtocolKinds.py`；套件核心保留值見 `socket_package.Protocol.ProtocolKinds`。
+示範專案的自訂協定列舉定義在 `examples/ProtocolKinds.py`；套件核心保留值見 `socket_package.Protocol.ProtocolKinds`。
 
 - 控制訊息 (CONTROL)
 - 資料訊息 (DATA)

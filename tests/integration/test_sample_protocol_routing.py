@@ -1,11 +1,11 @@
-"""Integration tests that exercise sample code under ``tests.examples``."""
+"""Integration tests aligned with the runnable sample code in ``examples/``."""
 
 import pytest
 
+from examples.ProtocolKinds import MainKind, SubKind
+from examples.SampleClientRecvMsgProtocol import SampleClientRecvMsgProtocol
+from examples.SampleServerRecvMsgProtocol import SampleServerRecvMsgProtocol
 from socket_package import MyByteArray
-from tests.examples.ProtocolKinds import MainKind, SubKind
-from tests.examples.SampleClientRecvMsgProtocol import SampleClientRecvMsgProtocol
-from tests.examples.SampleServerRecvMsgProtocol import SampleServerRecvMsgProtocol
 
 
 @pytest.mark.integration
