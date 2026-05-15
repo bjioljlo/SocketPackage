@@ -1,8 +1,10 @@
 from socket import socket
-from socket_package.Client import ClientSocket
+
 from socket_package import MyByteArray
-from ProtocolKinds import MainKind, SubKind
+from socket_package.Client import ClientSocket
 from socket_package.Protocol.ProtocolKinds import PROTOCOL_VERSION
+
+from .ProtocolKinds import MainKind, SubKind
 
 class SampleClientManager():
     def __init__(self, socket: ClientSocket) -> None:

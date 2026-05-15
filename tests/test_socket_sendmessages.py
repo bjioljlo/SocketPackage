@@ -21,6 +21,9 @@ class _SocketImpl(TSocket):
     def Stop(self):
         return None
 
+    def BroadcastMessages(self, client_socket, main_kind, sub_kind, msg, sendSelf=False):
+        return None
+
 
 def test_send_messages_writes_header_and_payload_in_frame():
     sock = _FakeSocket()

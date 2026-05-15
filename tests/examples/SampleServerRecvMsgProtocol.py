@@ -1,8 +1,10 @@
+from socket import socket
+
 from socket_package import MyByteArray
 from socket_package.Protocol.RecvMsgProtocol import ProtocolRouter
-from socket import socket
-from SampleServerManager import SampleServerManager
-from ProtocolKinds import MainKind, SubKind
+
+from .ProtocolKinds import MainKind, SubKind
+from .SampleServerManager import SampleServerManager
 
 class SampleServerRecvMsgProtocol(ProtocolRouter):
     def __init__(self, sampleMgr: SampleServerManager) -> None:

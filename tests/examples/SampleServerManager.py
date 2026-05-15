@@ -1,7 +1,9 @@
 from socket import socket
+
 from socket_package import MyByteArray
 from socket_package.Server import ServerSocket
-from ProtocolKinds import MainKind, SubKind
+
+from .ProtocolKinds import MainKind, SubKind
 
 
 class SampleServerManager():

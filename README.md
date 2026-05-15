@@ -92,18 +92,18 @@ client.SendHeartbeat(client.mainSocket, PROTOCOL_VERSION)
 
 已提供可直接執行的示範程式：
 
-- [tests/ProtocolKinds.py](D:/Playground/SocketPackage/tests/ProtocolKinds.py)
-- [tests/mainServer.py](D:/Playground/SocketPackage/tests/mainServer.py)
-- [tests/mainClient.py](D:/Playground/SocketPackage/tests/mainClient.py)
+- [tests/examples/ProtocolKinds.py](tests/examples/ProtocolKinds.py)
+- [tests/examples/mainServer.py](tests/examples/mainServer.py)
+- [tests/examples/mainClient.py](tests/examples/mainClient.py)
 
 啟動方式：
 
 ```bash
 # Terminal 1
-uv run python tests/mainServer.py
+uv run python tests/examples/mainServer.py
 
 # Terminal 2
-uv run python tests/mainClient.py
+uv run python tests/examples/mainClient.py
 ```
 
 client 輸入指令：
@@ -163,7 +163,7 @@ uv run pytest -q
 
 ## 通訊協定
 
-套件支援多種通訊協定，定義在 `ProtocolKinds.py` 中：
+示範專案的自訂協定列舉定義在 `tests/examples/ProtocolKinds.py`；套件核心保留值見 `socket_package.Protocol.ProtocolKinds`。
 
 - 控制訊息 (CONTROL)
 - 資料訊息 (DATA)

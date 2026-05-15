@@ -32,6 +32,21 @@ class ClientSocket(TSocket):
     def config(self) -> ClientConfig:
         return self.__config
 
+    def BroadcastMessages(
+        self,
+        client_socket: socket.socket,
+        main_kind: int,
+        sub_kind: int,
+        msg: MyByteArray,
+        sendSelf: bool = False,
+    ) -> None:
+        """Single upstream connection: broadcast is a normal framed send on that socket."""
+        if client_socket is None:
+            raise ValueError("client_socket is None.")
+        if msg is None:
+            raise ValueError("msg is None.")
+        self.SendMessages(client_socket, main_kind, sub_kind, msg)
+
     def Run(self, recvProtocol: IRecvProtocol):
         """
         Establishes a connection to the server and starts a thread to receive messages.

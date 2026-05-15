@@ -5,9 +5,9 @@ from socket_package.Protocol.ProtocolKinds import SubKind as CoreSubKind
 from socket_package.Protocol.SocketConfig import ClientConfig, ServerConfig
 from socket_package.Server import ServerSocket
 
-from ProtocolKinds import MainKind, SubKind
-from SampleClientRecvMsgProtocol import SampleClientRecvMsgProtocol
-from SampleServerRecvMsgProtocol import SampleServerRecvMsgProtocol
+from tests.examples.ProtocolKinds import MainKind, SubKind
+from tests.examples.SampleClientRecvMsgProtocol import SampleClientRecvMsgProtocol
+from tests.examples.SampleServerRecvMsgProtocol import SampleServerRecvMsgProtocol
 from socket_package import MyByteArray
 
 

@@ -34,9 +34,9 @@ uv run pytest
 *注意：使用 `-q` 取得簡約輸出，或使用 `-v` 取得詳細輸出。*
 
 ### 執行範例
-若要查看套件運行狀況，請執行位於 `tests` 目錄中的範例 Server 和 Client：
-1. **啟動 Server**: `uv run python tests/mainServer.py`
-2. **啟動 Client**: `uv run python tests/mainClient.py`
+若要查看套件運行狀況，請執行位於 `tests/examples` 的範例 Server 和 Client：
+1. **啟動 Server**: `uv run python tests/examples/mainServer.py`
+2. **啟動 Client**: `uv run python tests/examples/mainClient.py`
 
 ## 開發規範
 
@@ -59,7 +59,7 @@ uv run pytest
   - `Client/`: 用戶端連線邏輯。
   - `Server/`: 伺服器端監聽與連線管理。
   - `Protocol/`: 訊息傳遞、Framing 與路由邏輯。
-- `tests/`: 單元測試與可執行的示範腳本。
+- `tests/`: 單元測試（`test_*.py`）與手動整合示範（`tests/examples/`）。
 - `openspec/`: 實驗性變更管理與規格說明。
 
 ---
@@ -68,7 +68,7 @@ uv run pytest
 
 ## 專案概觀 (Project Overview)
 
-本儲存庫為 **Python 套件 `socket_package`**：提供 socket 抽象層、client／server 進入點，以及 frame 與 protocol 相關工具，供應用程式或服務整合自訂訊息框架與連線行為。性質為**函式庫**；`tests/` 內含自動化測試與手動整合示範程式。
+本儲存庫為 **Python 套件 `socket_package`**：提供 socket 抽象層、client／server 進入點，以及 frame 與 protocol 相關工具，供應用程式或服務整合自訂訊息框架與連線行為。性質為**函式庫**；`tests/` 內含自動化測試，`tests/examples/` 為手動整合示範程式。
 
 ### 核心技術 (Core Technologies)
 
@@ -82,7 +82,7 @@ uv run pytest
 ### 系統架構 (Architecture)
 
 - **`src/socket_package/`**：核心實作；公開模組大致分為 `Client/`、`Server/`、`Protocol/`（socket 抽象、進入點、frame／protocol 工具）
-- **`tests/`**：測試與示範；`test_*.py` 為自動化測試，`mainServer.py` 與 `mainClient.py` 為手動整合示範
+- **`tests/`**：自動化測試（`test_*.py`）；**`tests/examples/`**：手動整合示範（`mainServer.py`、`mainClient.py` 與 sample 模組）
 - **`openspec/`**：OpenSpec 設定與規格／變更產物（`config.yaml`、主規格 `specs/`、進行中變更 `changes/`、封存 `changes/archive/` 等）
 - **`README.md`**：安裝、使用方式與公開 API 摘要
 - **`pyproject.toml`**：專案中繼資料、相依性、建置與工具設定
@@ -95,7 +95,7 @@ uv run pytest
 ### 目錄結構
 
 - `src/socket_package/`：套件原始碼
-- `tests/`：單元／整合測試與可執行示範
+- `tests/`：單元／整合測試；`tests/examples/`：可執行示範與 sample 協定
 - `openspec/`：OpenSpec（`config.yaml`、`specs/`、`changes/` 等；CLI 與代理流程見 `.cline/skills/`、`.clinerules/workflows/`）
 - `pyproject.toml`、`uv.lock`：專案與鎖檔
 - `.gitignore`：忽略 `__pycache__/`、`.venv/`、建置產物等
@@ -114,8 +114,8 @@ uv run pytest
 ### 在專案環境中執行指令
 
 - `uv run pytest -q`：執行完整自動化測試（精簡輸出）
-- `uv run python tests/mainServer.py`：啟動示範 server
-- `uv run python tests/mainClient.py`：於另一終端機啟展示範 client
+- `uv run python tests/examples/mainServer.py`：啟動示範 server
+- `uv run python tests/examples/mainClient.py`：於另一終端機啟展示範 client
 - `uv run python -m <module>`：執行其他模組或入口（依需求）
 
 ### 本機無 uv 時的後備方式
