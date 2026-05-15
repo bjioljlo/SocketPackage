@@ -16,7 +16,8 @@
 
 ```bash
 uv sync
-uv run pytest -q
+uv run pytest -q                    # 單元 + 整合
+uv run pytest -q -m "not integration"   # 僅單元測試
 ```
 
 ## 套件提供的核心 API
@@ -139,12 +140,15 @@ server_cfg = ServerConfig(
 - frame 編解碼（含超長 frame 防護）
 - protocol router（含未處理策略）
 - message header（version + main/sub kind）
-- config 注入與 sample protocol 路由
+- config 注入（單元）
+- 與 `tests/examples` 連動之 sample protocol 路由（整合測試，見 `tests/integration/`）
 
 執行：
 
 ```bash
-uv run pytest -q
+uv run pytest -q                      # 單元 + 整合
+uv run pytest -q -m "not integration" # 僅單元
+uv run pytest -q tests/integration    # 僅整合
 ```
 
 ## 核心類別
