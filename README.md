@@ -16,7 +16,8 @@
 
 ```bash
 uv sync
-uv run pytest -q
+uv run pytest -q                    # 單元 + 整合
+uv run pytest -q -m "not integration"   # 僅單元測試
 ```
 
 ## 套件提供的核心 API
@@ -92,18 +93,18 @@ client.SendHeartbeat(client.mainSocket, PROTOCOL_VERSION)
 
 已提供可直接執行的示範程式：
 
-- [tests/ProtocolKinds.py](D:/Playground/SocketPackage/tests/ProtocolKinds.py)
-- [tests/mainServer.py](D:/Playground/SocketPackage/tests/mainServer.py)
-- [tests/mainClient.py](D:/Playground/SocketPackage/tests/mainClient.py)
+- [tests/examples/ProtocolKinds.py](tests/examples/ProtocolKinds.py)
+- [tests/examples/mainServer.py](tests/examples/mainServer.py)
+- [tests/examples/mainClient.py](tests/examples/mainClient.py)
 
 啟動方式：
 
 ```bash
 # Terminal 1
-uv run python tests/mainServer.py
+uv run python tests/examples/mainServer.py
 
 # Terminal 2
-uv run python tests/mainClient.py
+uv run python tests/examples/mainClient.py
 ```
 
 client 輸入指令：
@@ -139,12 +140,15 @@ server_cfg = ServerConfig(
 - frame 編解碼（含超長 frame 防護）
 - protocol router（含未處理策略）
 - message header（version + main/sub kind）
-- config 注入與 sample protocol 路由
+- config 注入（單元）
+- 與 `tests/examples/` 內 sample protocol 連動的路由行為（整合測試，見 `tests/integration/`）
 
 執行：
 
 ```bash
-uv run pytest -q
+uv run pytest -q                      # 單元 + 整合
+uv run pytest -q -m "not integration" # 僅單元
+uv run pytest -q tests/integration    # 僅整合
 ```
 
 ## 核心類別
@@ -163,7 +167,7 @@ uv run pytest -q
 
 ## 通訊協定
 
-套件支援多種通訊協定，定義在 `ProtocolKinds.py` 中：
+示範專案的自訂協定列舉定義在 `tests/examples/ProtocolKinds.py`；套件核心保留值見 `socket_package.Protocol.ProtocolKinds`。
 
 - 控制訊息 (CONTROL)
 - 資料訊息 (DATA)

@@ -29,14 +29,16 @@ uv sync
 ### 執行測試
 使用 `pytest` 執行測試套件：
 ```bash
-uv run pytest
+uv run pytest              # 單元 + 整合（完整）
+uv run pytest -m "not integration"   # 僅單元測試（排除標記為 integration 者）
+uv run pytest tests/integration      # 僅整合測試目錄
 ```
-*注意：使用 `-q` 取得簡約輸出，或使用 `-v` 取得詳細輸出。*
+*注意：使用 `-q` 取得簡約輸出，或使用 `-v` 取得詳細輸出。整合測試使用 `@pytest.mark.integration`，定義於 `pyproject.toml` 的 `[tool.pytest.ini_options]`。*
 
 ### 執行範例
-若要查看套件運行狀況，請執行位於 `tests` 目錄中的範例 Server 和 Client：
-1. **啟動 Server**: `uv run python tests/mainServer.py`
-2. **啟動 Client**: `uv run python tests/mainClient.py`
+若要查看套件運行狀況，請於專案根目錄執行 `tests/examples/` 內的範例 Server 與 Client：
+1. **啟動 Server**: `uv run python tests/examples/mainServer.py`
+2. **啟動 Client**: `uv run python tests/examples/mainClient.py`
 
 ## 開發規範
 
@@ -51,7 +53,7 @@ uv run pytest
 - **Buffer 安全**: 注意 `SocketConfig` 中的 `max_frame_size`，以防止因超大封包導致的記憶體耗盡。
 
 ### 測試
-- 新功能應在 `tests/` 目錄中包含單元測試。
+- 新功能應在 `tests/`（單元）或 `tests/integration/`（與 `tests/examples/` 內 sample 協定連動的整合測試）補上測試。
 - 特別針對邊際情況（空 Payload、大型 Payload）驗證 Frame 的編解碼。
 
 ## 專案結構
@@ -59,7 +61,7 @@ uv run pytest
   - `Client/`: 用戶端連線邏輯。
   - `Server/`: 伺服器端監聽與連線管理。
   - `Protocol/`: 訊息傳遞、Framing 與路由邏輯。
-- `tests/`: 單元測試與可執行的示範腳本。
+- `tests/`: 單元測試（根目錄 `test_*.py`）；`tests/integration/`：與 `tests/examples/` 連動之整合測試；`tests/examples/`：手動示範與 sample 協定。
 - `openspec/`: 實驗性變更管理與規格說明。
 
 ---
@@ -68,7 +70,7 @@ uv run pytest
 
 ## 專案概觀 (Project Overview)
 
-本儲存庫為 **Python 套件 `socket_package`**：提供 socket 抽象層、client／server 進入點，以及 frame 與 protocol 相關工具，供應用程式或服務整合自訂訊息框架與連線行為。性質為**函式庫**；`tests/` 內含自動化測試與手動整合示範程式。
+本儲存庫為 **Python 套件 `socket_package`**：提供 socket 抽象層、client／server 進入點，以及 frame 與 protocol 相關工具，供應用程式或服務整合自訂訊息框架與連線行為。性質為**函式庫**；`tests/` 內含單元測試，`tests/integration/` 為與 `tests/examples/` 內 sample 連動的自動化整合測試，`tests/examples/` 為手動整合示範程式。
 
 ### 核心技術 (Core Technologies)
 
@@ -82,7 +84,7 @@ uv run pytest
 ### 系統架構 (Architecture)
 
 - **`src/socket_package/`**：核心實作；公開模組大致分為 `Client/`、`Server/`、`Protocol/`（socket 抽象、進入點、frame／protocol 工具）
-- **`tests/`**：測試與示範；`test_*.py` 為自動化測試，`mainServer.py` 與 `mainClient.py` 為手動整合示範
+- **`tests/`**：根目錄之 `test_*.py` 為單元測試；**`tests/integration/`**：標記為 `integration`、匯入 `tests.examples` 內 sample 協定者；**`tests/examples/`**：手動示範腳本與 sample 模組
 - **`openspec/`**：OpenSpec 設定與規格／變更產物（`config.yaml`、主規格 `specs/`、進行中變更 `changes/`、封存 `changes/archive/` 等）
 - **`README.md`**：安裝、使用方式與公開 API 摘要
 - **`pyproject.toml`**：專案中繼資料、相依性、建置與工具設定
@@ -95,7 +97,7 @@ uv run pytest
 ### 目錄結構
 
 - `src/socket_package/`：套件原始碼
-- `tests/`：單元／整合測試與可執行示範
+- `tests/`：單元測試（根目錄 `test_*.py`）；`tests/integration/`：整合測試；`tests/examples/`：可執行示範與 sample 協定
 - `openspec/`：OpenSpec（`config.yaml`、`specs/`、`changes/` 等；CLI 與代理流程見 `.cline/skills/`、`.clinerules/workflows/`）
 - `pyproject.toml`、`uv.lock`：專案與鎖檔
 - `.gitignore`：忽略 `__pycache__/`、`.venv/`、建置產物等
@@ -114,8 +116,10 @@ uv run pytest
 ### 在專案環境中執行指令
 
 - `uv run pytest -q`：執行完整自動化測試（精簡輸出）
-- `uv run python tests/mainServer.py`：啟動示範 server
-- `uv run python tests/mainClient.py`：於另一終端機啟展示範 client
+- `uv run pytest -q -m "not integration"`：僅單元測試
+- `uv run pytest -q tests/integration`：僅整合測試
+- `uv run python tests/examples/mainServer.py`：啟動示範 server
+- `uv run python tests/examples/mainClient.py`：於另一終端機啟展示範 client
 - `uv run python -m <module>`：執行其他模組或入口（依需求）
 
 ### 本機無 uv 時的後備方式
@@ -140,11 +144,11 @@ uv run pytest
 
 ## 測試指南
 
-- **位置：** `tests/`
+- **位置：** `tests/`（單元）、`tests/integration/`（與 `tests.examples` 套件連動之整合測試）
 - **命名：** `test_*.py`；測試函式名稱應描述行為與預期，例如 `test_send_messages_writes_header_and_payload_in_frame`
-- **涵蓋：** 建議優先補足 frame 編解碼、routing 與 config 的單元測試，再視需要補充 socket 層級整合案例
+- **涵蓋：** 建議優先補足 frame 編解碼、routing 與 config 的單元測試；驗證 `tests/examples/` 內 sample 路由者請放在 `tests/integration/` 並加上 `@pytest.mark.integration`
 - **Bug 修復：** 應附回歸測試；理想上先寫失敗測試再修正實作（TDD）
-- **提交前：** 執行 `uv run pytest -q`
+- **提交前：** 執行 `uv run pytest -q`（完整套件）；若僅改核心、未動範例，可至少執行 `uv run pytest -q -m "not integration"`
 
 ## 開發流程規範
 
