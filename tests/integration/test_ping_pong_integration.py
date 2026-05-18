@@ -36,5 +36,4 @@ def test_ping_pong_roundtrip():
 
     # cleanup
     client.Stop()
-    server.Stop()
     time.sleep(0.1)
