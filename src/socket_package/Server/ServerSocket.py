@@ -1,5 +1,6 @@
 import socket
 import threading
+import time
 
 from socket_package.Protocol.FrameCodec import FrameDecoder, FrameTooLargeError
 from socket_package.Protocol.MyByteArray import MyByteArray
@@ -8,17 +9,38 @@ from socket_package.Protocol.ProtocolKinds import MainKind, SubKind
 from socket_package.Protocol.RecvMsgProtocol import IRecvProtocol
 from socket_package.Protocol.SocketConfig import ServerConfig
 
+
+class ClientInfo:
+    __slots__ = ("client_id", "client_socket", "last_heartbeat_time", "player_data")
+
+    def __init__(self, client_id: int, client_socket: socket.socket, last_heartbeat_time: float) -> None:
+        self.client_id = client_id
+        self.client_socket = client_socket
+        self.last_heartbeat_time = last_heartbeat_time
+        self.player_data: dict[str, object] = {}
+
+
 class ServerSocket(TSocket):
     def __init__(self, config: ServerConfig | None = None) -> None:
-        self.__clients: list[socket.socket] = []
+        self.__clients: dict[int, ClientInfo] = {}
+        self.__socket_to_id: dict[int, int] = {}  # fileno -> client_id
         self.__clients_lock = threading.Lock()
         self.__server_socket: socket.socket | None = None
         self.__IsStop = False
         self.__config = config or ServerConfig()
+        self.__next_client_id: int = 1
 
     @property
     def config(self) -> ServerConfig:
         return self.__config
+
+    def get_client_info(self, client_id: int) -> ClientInfo | None:
+        with self.__clients_lock:
+            return self.__clients.get(client_id)
+
+    def get_all_clients(self) -> dict[int, ClientInfo]:
+        with self.__clients_lock:
+            return dict(self.__clients)
 
     def Run(self, recvProtocol: IRecvProtocol):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -33,8 +55,11 @@ class ServerSocket(TSocket):
                 client_socket, addr = server_socket.accept()
                 print("\n[Server][{}] ".format("Accepted connection from {}:{}".format(addr[0], addr[1])))
                 with self.__clients_lock:
-                    self.__clients.append(client_socket)
-                client_thread = threading.Thread(target=self._handle_client, args=(client_socket, recvProtocol), daemon=True)
+                    client_id = self.__next_client_id
+                    self.__next_client_id += 1
+                    self.__clients[client_id] = ClientInfo(client_id, client_socket, time.time())
+                    self.__socket_to_id[client_socket.fileno()] = client_id
+                client_thread = threading.Thread(target=self._handle_client, args=(client_socket, client_id, recvProtocol), daemon=True)
                 client_thread.start()
             except socket.timeout:
                 print("\n[Server][{}] ".format("Socket timeout ..."))
@@ -49,11 +74,11 @@ class ServerSocket(TSocket):
         if self.__server_socket is not None:
             self.__server_socket.close()
         with self.__clients_lock:
-            for client in list(self.__clients):
-                self.SendMessages(client, MainKind.CONTROL, SubKind.STOP, MyByteArray(), self.__config.protocol_version)
-                client.close()
+            for client_info in list(self.__clients.values()):
+                self.SendMessages(client_info.client_socket, MainKind.CONTROL, SubKind.STOP, MyByteArray(), self.__config.protocol_version)
+                client_info.client_socket.close()
 
-    def _handle_client(self, client_socket:socket, recvProtocol: IRecvProtocol):
+    def _handle_client(self, client_socket:socket, client_id: int, recvProtocol: IRecvProtocol):
         decoder = FrameDecoder(max_frame_size=self.__config.max_frame_size)
         while True:
             try:
@@ -92,15 +117,24 @@ class ServerSocket(TSocket):
                         except Exception:
                             pass
                         continue
-                recvProtocol.recv_msg(client_socket, main_kind, sub_kind, aMsg)
+                if main_kind == MainKind.CONTROL and sub_kind == SubKind.HEARTBEAT:
+                    with self.__clients_lock:
+                        if client_id in self.__clients:
+                            self.__clients[client_id].last_heartbeat_time = time.time()
+                    try:
+                        self.SendMessages(client_socket, MainKind.CONTROL, SubKind.HEARTBEAT, MyByteArray(), self.__config.protocol_version)
+                    except Exception:
+                        pass
+                    continue
+                recvProtocol.recv_msg(client_socket, client_id, main_kind, sub_kind, aMsg)
 
-        with self.__clients_lock:
-            client_index = self.__clients.index(client_socket) if client_socket in self.__clients else -1
-        print("\n[Server][{}] ".format("Client disconnect...{}".format(client_index)))
+        print("\n[Server][{}] ".format("Client disconnect...{}".format(client_id)))
         client_socket.close()
         with self.__clients_lock:
-            if client_socket in self.__clients:
-                self.__clients.remove(client_socket)
+            if client_id in self.__clients:
+                del self.__clients[client_id]
+            if client_socket.fileno() in self.__socket_to_id:
+                del self.__socket_to_id[client_socket.fileno()]
 
     def BroadcastMessages(self, client_socket: socket, main_kind: int, sub_kind: int, msg: MyByteArray, sendSelf: bool = False):
         """Broadcast a message to all the clients that are currently connected to the server.\n
@@ -120,9 +154,10 @@ class ServerSocket(TSocket):
         if msg is None:
             raise ValueError("msg is None.")
         with self.__clients_lock:
-            clients = list(self.__clients)
+            clients = list(self.__clients.values())
 
-        for client in clients:
+        for client_info in clients:
+            client = client_info.client_socket
             if client is None:
                 continue
             if client == client_socket:

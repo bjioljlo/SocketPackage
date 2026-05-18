@@ -28,14 +28,14 @@ def test_sample_server_protocol_routes_stop_and_chat():
     mgr = FakeServerManager()
     protocol = SampleServerRecvMsgProtocol(mgr)
 
-    protocol.recv_msg(None, MainKind.CONTROL, SubKind.STOP, MyByteArray())
+    protocol.recv_msg(None, 1, MainKind.CONTROL, SubKind.STOP, MyByteArray())
     assert mgr.stopped is True
 
-    protocol.recv_msg(None, MainKind.CONTROL, SubKind.HEARTBEAT, MyByteArray())
+    protocol.recv_msg(None, 1, MainKind.CONTROL, SubKind.HEARTBEAT, MyByteArray())
 
     chat = MyByteArray()
     chat.WriteStr("hi")
-    protocol.recv_msg(None, MainKind.CHAT, SubKind.CLIENT_MESSAGE, chat)
+    protocol.recv_msg(None, 1, MainKind.CHAT, SubKind.CLIENT_MESSAGE, chat)
     assert mgr.broadcast == "hi"
     assert mgr.echo == "hi"
 
@@ -60,17 +60,17 @@ def test_sample_client_protocol_routes_actions():
     mgr = FakeClientManager()
     protocol = SampleClientRecvMsgProtocol(mgr)
 
-    protocol.recv_msg(None, MainKind.CONTROL, SubKind.STOP, MyByteArray())
+    protocol.recv_msg(None, 1, MainKind.CONTROL, SubKind.STOP, MyByteArray())
     assert mgr.stopped is True
 
-    protocol.recv_msg(None, MainKind.CONTROL, SubKind.HEARTBEAT, MyByteArray())
+    protocol.recv_msg(None, 1, MainKind.CONTROL, SubKind.HEARTBEAT, MyByteArray())
 
     other = MyByteArray()
     other.WriteStr("other-msg")
-    protocol.recv_msg(None, MainKind.CHAT_BROADCAST, SubKind.BROADCAST_MESSAGE, other)
+    protocol.recv_msg(None, 1, MainKind.CHAT_BROADCAST, SubKind.BROADCAST_MESSAGE, other)
     assert mgr.other == "other-msg"
 
     me = MyByteArray()
     me.WriteStr("me-msg")
-    protocol.recv_msg(None, MainKind.CHAT_ECHO, SubKind.ECHO_MESSAGE, me)
+    protocol.recv_msg(None, 1, MainKind.CHAT_ECHO, SubKind.ECHO_MESSAGE, me)
     assert mgr.me == "me-msg"

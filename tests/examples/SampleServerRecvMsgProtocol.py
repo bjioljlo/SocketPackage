@@ -15,13 +15,13 @@ class SampleServerRecvMsgProtocol(ProtocolRouter):
         self.register(MainKind.CONTROL, SubKind.HEARTBEAT, self._on_heartbeat)
         self.register(MainKind.CHAT, SubKind.CLIENT_MESSAGE, self._on_client_message)
 
-    def _stop_server(self, mainSocket: socket, msg: MyByteArray):
+    def _stop_server(self, mainSocket: socket, client_id: int, msg: MyByteArray):
         self._SampleMgr.SampleStop()
 
-    def _on_heartbeat(self, mainSocket: socket, msg: MyByteArray):
+    def _on_heartbeat(self, mainSocket: socket, client_id: int, msg: MyByteArray):
         return None
 
-    def _on_client_message(self, mainSocket: socket, msg: MyByteArray):
+    def _on_client_message(self, mainSocket: socket, client_id: int, msg: MyByteArray):
         message: str = msg.ReadStr()
         aMsg = MyByteArray()
         aMsg.WriteStr(message)

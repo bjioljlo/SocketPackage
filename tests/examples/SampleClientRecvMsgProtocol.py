@@ -16,14 +16,14 @@ class SampleClientRecvMsgProtocol(ProtocolRouter):
         self.register(MainKind.CHAT_BROADCAST, SubKind.BROADCAST_MESSAGE, self._show_other)
         self.register(MainKind.CHAT_ECHO, SubKind.ECHO_MESSAGE, self._show_me)
 
-    def _stop_client(self, mainSocket: socket, msg: MyByteArray):
+    def _stop_client(self, mainSocket: socket, client_id: int, msg: MyByteArray):
         self._SampleMgr.SampleStop()
 
-    def _show_other(self, mainSocket: socket, msg: MyByteArray):
+    def _show_other(self, mainSocket: socket, client_id: int, msg: MyByteArray):
         self._SampleMgr.SampleShowOther(msg)
 
-    def _show_me(self, mainSocket: socket, msg: MyByteArray):
+    def _show_me(self, mainSocket: socket, client_id: int, msg: MyByteArray):
         self._SampleMgr.SampleShowMe(msg)
 
-    def _heartbeat(self, mainSocket: socket, msg: MyByteArray):
+    def _heartbeat(self, mainSocket: socket, client_id: int, msg: MyByteArray):
         return None

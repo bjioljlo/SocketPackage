@@ -5,18 +5,18 @@ from typing import Callable
 
 from socket_package.Protocol.MyByteArray import MyByteArray
 
-ProtocolHandler = Callable[[socket, MyByteArray], None]
+ProtocolHandler = Callable[[socket, int, MyByteArray], None]
 
 class IRecvProtocol(ABC):
     '''接收分類介面'''
     @abstractmethod
-    def recv_msg(self, mainSocket:socket, main_kind: int, sub_kind: int, msg: MyByteArray):
+    def recv_msg(self, mainSocket:socket, client_id: int, main_kind: int, sub_kind: int, msg: MyByteArray):
         pass
 
 class TRecvProtocol(IRecvProtocol):
     '''接收分類實作'''
     @abstractmethod
-    def recv_msg(self, mainSocket:socket, main_kind: int, sub_kind: int, msg: MyByteArray):
+    def recv_msg(self, mainSocket:socket, client_id: int, main_kind: int, sub_kind: int, msg: MyByteArray):
         print("\n ReceivedMessages :{} - {}".format(main_kind, sub_kind))
 
 
@@ -43,14 +43,14 @@ class ProtocolRouter(TRecvProtocol):
 
         return decorator
 
-    def recv_msg(self, mainSocket: socket, main_kind: int, sub_kind: int, msg: MyByteArray):
+    def recv_msg(self, mainSocket: socket, client_id: int, main_kind: int, sub_kind: int, msg: MyByteArray):
         handler = self._routes.get((main_kind, sub_kind))
         if handler is None:
-            self.on_unhandled(mainSocket, main_kind, sub_kind, msg)
+            self.on_unhandled(mainSocket, client_id, main_kind, sub_kind, msg)
             return
-        handler(mainSocket, msg)
+        handler(mainSocket, client_id, msg)
 
-    def on_unhandled(self, mainSocket: socket, main_kind: int, sub_kind: int, msg: MyByteArray):
+    def on_unhandled(self, mainSocket: socket, client_id: int, main_kind: int, sub_kind: int, msg: MyByteArray):
         if self._unhandled_policy == UnhandledPolicy.IGNORE:
             return
         if self._unhandled_policy == UnhandledPolicy.RAISE:
