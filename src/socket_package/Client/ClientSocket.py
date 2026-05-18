@@ -9,6 +9,7 @@ from socket_package.Protocol.ProtocolKinds import MainKind, SubKind
 from socket_package.Protocol.RecvMsgProtocol import IRecvProtocol
 from socket_package.Protocol.SocketConfig import ClientConfig
 
+
 class ClientSocket(TSocket):
     @property
     def mainSocket(self) -> socket:
@@ -27,6 +28,7 @@ class ClientSocket(TSocket):
         self.__IsConnect: bool = False
         self.__IsShutDown: bool = False
         self.__config = config or ClientConfig()
+        self.__stop_heartbeat_event: threading.Event = threading.Event()
         self._last_rtt_ms: float | None = None
 
     def get_rtt_ms(self) -> float | None:
@@ -82,6 +84,10 @@ class ClientSocket(TSocket):
                     receive_thread = threading.Thread(target=self._receive_messages, args=(self.__client_socket, recvProtocol), daemon=True)
                     receive_thread.start()
                     self.__IsConnect = True
+                    self.__stop_heartbeat_event.clear()
+                    heartbeat_thread = threading.Thread(target=self._heartbeat_loop, daemon=True)
+                    heartbeat_thread.start()
+                    self.__heartbeat_thread = heartbeat_thread
                 except Exception:
                     print("\n[Client][{}] ".format("Server can not connect!"))
                     time.sleep(self.__config.retry_interval_sec)
@@ -96,9 +102,19 @@ class ClientSocket(TSocket):
         """
         #TODO 結束client之前要完成的事
         print("\n[Client][{}] ".format("Stop"))
+        self.__stop_heartbeat_event.set()
         if self.__client_socket is not None:
             self.__client_socket.close()
         self.__IsShutDown = True
+
+    def _heartbeat_loop(self):
+        while not self.__stop_heartbeat_event.is_set():
+            if self.__client_socket is not None and self.__IsConnect:
+                try:
+                    self.SendHeartbeat(self.__client_socket, self.__config.protocol_version)
+                except Exception:
+                    pass
+            self.__stop_heartbeat_event.wait(timeout=self.__config.heartbeat_interval_sec)
 
     def _receive_messages(self, client_socket:socket, recvProtocol: IRecvProtocol):
         decoder = FrameDecoder(max_frame_size=self.__config.max_frame_size)

@@ -11,6 +11,7 @@ class ClientConfig:
     retry_interval_sec: float = 1.0
     protocol_version: int = PROTOCOL_VERSION
     max_frame_size: int = 1024 * 1024
+    heartbeat_interval_sec: float = 5.0
 
 
 @dataclass(slots=True, frozen=True)
@@ -22,3 +23,4 @@ class ServerConfig:
     buffer_size: int = 4096
     protocol_version: int = PROTOCOL_VERSION
     max_frame_size: int = 1024 * 1024
+    heartbeat_timeout_sec: float = 15.0
