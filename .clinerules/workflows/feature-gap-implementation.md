@@ -6,7 +6,7 @@
 
 ## Steps
 
-### 1. 確認當前分支與狀態
+### 1. 確認當前分支與狀態 + 檢查 feature-gaps 來源
 
 ```bash
 git branch --show-current
@@ -15,14 +15,30 @@ git status --short
 
 確保在 `develop` 分支且工作目錄乾淨。
 
-### 2. 閱讀 feature-gaps.md，選擇項目
+同時檢查 feature-gaps 來源是否存在：
+```bash
+test -f docs/feature-gaps.md && echo "exists" || echo "not-exists"
+```
 
-讀取 `docs/feature-gaps.md`，從 🔴 高優先開始，找第一個尚未實作的項目。
+### 2. 獲取 Feature Gap 資訊
+
+根據 Step 1 的檢查結果，分為兩種情境：
+
+**情境 A：`docs/feature-gaps.md` 存在**
+讀取 `docs/feature-gaps.md`，從 🔴 高優先開始，找第一個尚未實作的項目（或依 Input 指定的 gap 編號）。
 
 記錄該項目的：
 - 編號與標題（如 `1. 🫀 自動心跳與斷線偵測`）
 - 核心需求摘要
 - 轉換為 kebab-case change name（如 `auto-heartbeat-detection`）
+
+**情境 B：`docs/feature-gaps.md` 不存在**
+- 若使用者已在 Input 中提供 gap 描述（如「實作心跳」或「實作 gap 編號 1」），則直接解析使用
+- 否則，詢問使用者描述想要實作的功能缺口（名稱、需求、行為），例如：
+  - 「我想要自動心跳與斷線偵測」
+  - 「新增房間/頻道管理功能」
+- 基於描述萃取功能名稱，轉換為 kebab-case change name
+- gap 編號設為 `custom`，標題取自分類名稱
 
 ### 3. OpenSpec Propose
 
@@ -75,6 +91,10 @@ Closes feature-gap #<number>: <change-name>"
 ```
 
 使用 Conventional Commits 格式（feat/fix/refactor/chore/docs）。
+
+> commit 訊息中的 `#<number>`：
+> - 若 gap 來自 `docs/feature-gaps.md`：填寫對應的 gap 編號
+> - 若為自定義 gap（情境 B）：省略編號，改為 `Closes feature-gap: <change-name>`
 
 ## 注意事項
 
