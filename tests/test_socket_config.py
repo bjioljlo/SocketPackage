@@ -8,7 +8,7 @@ from socket_package.Server import ServerSocket
 
 def test_package_exposes_only_core_protocol_kinds():
     assert [kind.value for kind in CoreMainKind] == [0]
-    assert [kind.value for kind in CoreSubKind] == [0, 1]
+    assert [kind.value for kind in CoreSubKind] == [0, 1, 2, 3]
 
 
 def test_client_socket_uses_injected_config():

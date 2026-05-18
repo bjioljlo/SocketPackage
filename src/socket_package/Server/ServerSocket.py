@@ -79,8 +79,19 @@ class ServerSocket(TSocket):
                         )
                     )
                     continue
-                if main_kind == MainKind.CONTROL and sub_kind == SubKind.HEARTBEAT:
-                    continue
+                # Auto-respond to Ping with Pong echoing timestamp
+                if main_kind == MainKind.CONTROL:
+                    if sub_kind == SubKind.HEARTBEAT:
+                        continue
+                    if sub_kind == SubKind.PING:
+                        try:
+                            sent_ts = aMsg.ReadInt64()
+                            out = MyByteArray()
+                            out.WriteInt64(sent_ts)
+                            self.SendMessages(client_socket, MainKind.CONTROL, SubKind.PONG, out, self.__config.protocol_version)
+                        except Exception:
+                            pass
+                        continue
                 recvProtocol.recv_msg(client_socket, main_kind, sub_kind, aMsg)
 
         with self.__clients_lock:

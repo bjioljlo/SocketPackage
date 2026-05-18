@@ -24,9 +24,18 @@ class MyByteArray():
     def WriteInt(self, input: int):
         self.__msg += struct.pack("I", input)
 
+    def WriteInt64(self, input: int):
+        # unsigned long long (8 bytes)
+        self.__msg += struct.pack("Q", input)
+
     def ReadByte(self):
         output = struct.unpack_from("s", self.__msg, self.__offset)[0]
         self.__offset += struct.calcsize("s")
+        return output
+
+    def ReadInt64(self) -> int:
+        output = struct.unpack_from("Q", self.__msg, self.__offset)[0]
+        self.__offset += struct.calcsize("Q")
         return output
     def ReadStr(self) -> str:
         temp_bytes = self.ReadByteArray()

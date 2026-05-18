@@ -27,6 +27,20 @@ class ClientSocket(TSocket):
         self.__IsConnect: bool = False
         self.__IsShutDown: bool = False
         self.__config = config or ClientConfig()
+        self._last_rtt_ms: float | None = None
+
+    def get_rtt_ms(self) -> float | None:
+        """Return last measured RTT in milliseconds or None if not measured."""
+        return self._last_rtt_ms
+
+    def send_ping(self) -> None:
+        """Send a Ping control message containing current timestamp in ms."""
+        if self.__client_socket is None:
+            raise ValueError("Not connected")
+        msg = MyByteArray()
+        now_ms = int(time.time() * 1000)
+        msg.WriteInt64(now_ms)
+        self.SendMessages(self.__client_socket, MainKind.CONTROL, SubKind.PING, msg, self.__config.protocol_version)
 
     @property
     def config(self) -> ClientConfig:
@@ -112,8 +126,18 @@ class ClientSocket(TSocket):
                         )
                     )
                     continue
-                if main_kind == MainKind.CONTROL and sub_kind == SubKind.HEARTBEAT:
-                    continue
+                # Handle control messages locally
+                if main_kind == MainKind.CONTROL:
+                    if sub_kind == SubKind.HEARTBEAT:
+                        continue
+                    if sub_kind == SubKind.PONG:
+                        try:
+                            sent_ts = aMsg.ReadInt64()
+                            now_ms = int(time.time() * 1000)
+                            self._last_rtt_ms = float(now_ms - sent_ts)
+                        except Exception:
+                            pass
+                        continue
                 recvProtocol.recv_msg(client_socket, main_kind, sub_kind, aMsg)
         print("\n[Client][{}] ".format("Server disconnect..."))
         client_socket.close()
